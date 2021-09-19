@@ -1,6 +1,6 @@
-const client = new dsteem.Client('https://api.hive.blog');
+const client = new dhive.Client('https://api.hive.blog');
 
-console.log("KeyChain object",window.steem_keychain);
+console.log("KeyChain object",window.hive_keychain);
 
 // Checking if the already exists
 async function checkAccountName(username) {
@@ -18,8 +18,8 @@ async function getRC(username) {
 function getPrivateKeys(username, password, roles = ['owner', 'active', 'posting', 'memo']) {
   const privKeys = {};
   roles.forEach((role) => {
-    privKeys[role] = dsteem.PrivateKey.fromLogin(username, password, role).toString();
-    privKeys[`${role}Pubkey`] = dsteem.PrivateKey.from(privKeys[role]).createPublic().toString();
+    privKeys[role] = dhive.PrivateKey.fromLogin(username, password, role).toString();
+    privKeys[`${role}Pubkey`] = dhive.PrivateKey.from(privKeys[role]).createPublic().toString();
   });
 
   return privKeys;
@@ -29,7 +29,7 @@ function getPrivateKeys(username, password, roles = ['owner', 'active', 'posting
 function suggestPassword() {
   const array = new Uint32Array(10);
   window.crypto.getRandomValues(array);
-  return 'P'+dsteem.PrivateKey.fromSeed(array).toString();
+  return 'P'+dhive.PrivateKey.fromSeed(array).toString();
 }
 
 $(document).ready(async function() {
@@ -65,7 +65,7 @@ $(document).ready(async function() {
 
     const op = ['claim_account', {
       creator: username,
-      fee: dsteem.Asset.from('0.000 STEEM'),
+      fee: dhive.Asset.from('0.000 HIVE'),
       extensions: [],
     }];
 
@@ -88,7 +88,7 @@ $(document).ready(async function() {
         alert('HIVE Keychain was not found.\nInstall Hive Keychain extension or provide an Active Key.');
       }
     } else {
-      client.broadcast.sendOperations([op], dsteem.PrivateKey.from(activeKey))
+      client.broadcast.sendOperations([op], dhive.PrivateKey.from(activeKey))
         .then((res) => {
           console.log(res);
           feedback.addClass('alert-success').text('You have successfully claimed a discounted account!');
@@ -105,6 +105,7 @@ $(document).ready(async function() {
   $('#create-account').submit(async function(e) {
     e.preventDefault();
 
+    const fee = $('#mode_fee').prop('checked')
     const username = $('#new-account').val();
     const password = $('#password').val();
     const creator = $('#creator').val();
@@ -113,29 +114,31 @@ $(document).ready(async function() {
     const feedback = $('#create-account-feedback');
 
     const ops = [];
-
     const keys = getPrivateKeys(username, password);
-
     const create_op = [
       'create_claimed_account',
       {
         creator,
         new_account_name: username,
-        owner: dsteem.Authority.from(keys.ownerPubkey),
-        posting: dsteem.Authority.from(keys.postingPubkey),
-        active: dsteem.Authority.from(keys.activePubkey),
+        owner: dhive.Authority.from(keys.ownerPubkey),
+        posting: dhive.Authority.from(keys.postingPubkey),
+        active: dhive.Authority.from(keys.activePubkey),
         memo_key: keys.memoPubkey,
         json_metadata: '',
         extensions: [],
       },
     ];
+    if(fee) {
+      create_op[0] = "account_create"
+      create_op[1].fee = { "amount": "3", "precision": 3, "nai": "@@000000021" }
+    }
 
     ops.push(create_op);
 
     if (sp > 0) {
       // Converting HP to VESTS
-      const delegation = (dsteem.getVestingSharePrice(await client.database.getDynamicGlobalProperties()))
-        .convert({ amount: sp, symbol: 'STEEM' });
+      const delegation = (dhive.getVestingSharePrice(await client.database.getDynamicGlobalProperties()))
+        .convert({ amount: sp, symbol: 'HIVE' });
 
       const delegate_op = [
         'delegate_vesting_shares',
@@ -150,14 +153,14 @@ $(document).ready(async function() {
 
     feedback.removeClass('alert-success').removeClass('alert-danger');
 
-    client.broadcast.sendOperations(ops, dsteem.PrivateKey.from(active))
-      .then((r) => {
-        console.log(r);
-        feedback.addClass('alert-success').text('Account: '+ username +' has been created successfully.');
-      })
-      .catch(e => {
-        console.log(e);
-        feedback.addClass('alert-danger').text(e.message);
-      });
+    client.broadcast.sendOperations(ops, dhive.PrivateKey.from(active))
+    .then((r) => {
+      console.log(r);
+      feedback.addClass('alert-success').text('Account: '+ username +' has been created successfully.');
+    })
+    .catch(e => {
+      console.log(e);
+      feedback.addClass('alert-danger').text(e.message);
+    });
   });
 });

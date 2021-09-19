@@ -27,7 +27,7 @@
 					<div class="form-group">
 						<label for="active-key" class="sr-only">Active Key</label>
 						<input type="password" name="active-key" id="active-key" autocomplete="off" class="form-control" placeholder="Active Key">
-						<p class="text-muted small mt-1">Leave this field blank to use Steem Keychain.</p>
+						<!-- <p class="text-muted small mt-1">Leave this field blank to use Hive Keychain.</p> -->
 					</div>
 				</div>
 				<div class="col-md-3 col-lg-2">
@@ -36,11 +36,28 @@
 			</div>
 		</form>
 		<hr>
-		<h3>Create Claimed Account</h3>
+		<h3>Create Account</h3>
 		<form id="create-account" method="POST">
-
 			<div id="create-account-feedback" class="alert"></div>
-	
+			<h6>
+				Mode:&nbsp;
+				<div class="custom-control custom-radio custom-control-inline">
+					<input type="radio" class="custom-control-input" id="mode_ticket" name="paymode" value="ticket" checked>
+					<label class="custom-control-label" for="mode_ticket">Use claimed ticket</label>
+				</div>
+				<div class="custom-control custom-radio custom-control-inline">
+					<input type="radio" class="custom-control-input" id="mode_fee" name="paymode" value="fee" >
+					<label class="custom-control-label" for="mode_fee">Pay HIVE fee</label>
+				</div>
+			</h6>
+
+			<!-- <label>
+				<input type="radio" name="paymode" value="always" id="ticket" checked/> Account Ticket&nbsp;
+			</label>
+			<label>
+				<input type="radio" name="paymode" value="never" id="fee" /> Pay HIVE fee&nbsp;
+			</label> -->
+
 			<div class="form-group">
 				<label for="new-account" class="text-dark">New Account Name</label>
 				<input type="text" name="new-account" id="new-account" autocomplete="off" class="form-control">
@@ -59,7 +76,9 @@
 			<div class="form-group">
 				<label for="creator-key" class="text-dark">Creator Active Key</label>
 				<input type="password" name="creator-key" id="creator-key" autocomplete="off" class="form-control">
-				<p class="text-muted">Enter the creator account's PRIVATE ACTIVE KEY. <span class="text-muted small mt-1">(Leave this field blank to use Steem Keychain).</span></p>
+				<p class="text-muted">Enter the creator account's PRIVATE ACTIVE KEY.&nbsp;
+					<!-- <span class="text-muted small mt-1">(Leave this field blank to use Hive Keychain).</span> -->
+				</p>
 			</div>
 			<div class="form-group">
 				<label for="delegation" class="text-dark">Delegation (optional)</label>
@@ -76,7 +95,7 @@
 		</p>
 	</div>
 	<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
-	<script src="https://unpkg.com/dsteem@^0.10.1/dist/dsteem.js"></script>
+	<script src="https://unpkg.com/@hiveio/dhive@latest/dist/dhive.js"></script>
 	<script src="js/app.js"></script>
 </body>
 </html>
